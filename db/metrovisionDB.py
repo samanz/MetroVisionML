@@ -32,50 +32,32 @@ class metrovisionDB:
         if(file.find(self.ext) != -1):
           print file
           f = Image.open(os.path.join(drc, file), 'r')
-          #while(1): # Read the image file char by char
-          #  char = f.read(1)
-          #  if not char: break
-          #  image += char
-          #image = zlib.compress(image,9)
           image = self.db.escape_string(f.tostring())
 	  print len(f.tostring())
           self.storeImage(f.tostring(), tag)
           
   def storeImage(self, image, tag):
-    query = 'INSERT INTO item (width, height, image, classification, dataset_id, format_id) VALUES ("'
+    class_id = self.getClassificationId(tag)
+    query = 'INSERT INTO item (width, height, image, classification_id, dataset_id, format_id) VALUES ("'
     query += self.width + '","'
     query += self.height + '","'
     query += '","'
     #query += image + '","'
-    query += tag + '","'
+    query += class_id + '","'
     query += self.dataset_id + '","'
     query += self.format_id + '"'
     query += ')'
-    #print query
     self.db.query(query)
     id_query = 'SELECT id from item where dataset_id = ' + self.dataset_id + ' ORDER BY id DESC'
     self.db.query(id_query)
     r=self.db.store_result()
     insert_id = r.fetch_row()[0][0]
     print insert_id
-    #start=0
-    #end=len(image)+1
-    #while end < len(image):
-    #    print (float(end)/float(len(image)))
     query2 = "UPDATE item SET image = CONCAT(image,"
     query2 += '"' + self.db.escape_string(image) + '"'
     query2 += ") WHERE id = "
     query2 += insert_id
-    #print query2
-    self.db.query(query2)
-    #start=end+1
-    #if end==len(image)-1:
-    #end+=1
-    #else: 
-    #if end+65535 < len(image):
-    #end+=65535
-    #else:
-    #end= len(image)-1  
+    self.db.query(query2) 
     print "Successfuly tagged image as", tag 
 
   def storeFormatId(self):
@@ -92,6 +74,25 @@ class metrovisionDB:
     self.db.query(query)
     r = self.db.store_result()
     self.format_id = r.fetch_row()[0][0]
+
+  def getClassificationId(self, name):
+    self.db.query('SELECT COUNT(*) FROM classification WHERE name = "' + name + '"')
+    r = self.db.store_result()
+    value = r.fetch_row()[0][0]
+    if not int(value):
+      print "No classification by name ", name, " creating new classification"
+      u_low = raw_input("What low value of the u range (0 for idk)? ")
+      u_high = raw_input("What high value of the u range (255 for idk)? ")
+      v_low = raw_input("What low value of the v range (0 for idk)? ")
+      v_high = raw_input("What high value of the v range (255 for idk)? ")
+      query = 'INSERT INTO classification (name, u_low, u_high, v_low, v_high) VALUES ('
+      query += '"' + name + '","' + u_low + '","' + u_high + '","'+ v_low + '","' + v_high + '")'
+      self.db.query(query)
+      print "Classification creation successful"
+    query = 'SELECT id FROM classification WHERE name = "' + name + '"'
+    self.db.query(query)
+    r = self.db.store_result()
+    return r.fetch_row()[0][0]
 
   def storeDatasetId(self):
     self.db.query('set global max_allowed_packet=1000000000')
@@ -112,7 +113,6 @@ class metrovisionDB:
     self.db.query(query)
     r = self.db.store_result()
     self.dataset_id = r.fetch_row()[0][0]
-
 
 dataset = raw_input("Dataset name: ")
 
