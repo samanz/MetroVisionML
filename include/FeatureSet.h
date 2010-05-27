@@ -41,6 +41,14 @@ public:
   	 * Constructor takes in the FeaturesExtractor
 	*/
 	FeatureSet(FeaturesExtractor * theExtractor);
+	
+	/**
+	 * Constructor that takes in the filename of the features and the classifications to load
+	 * @param featuresFilename The filename of the features to load.
+	 * @param classificationFilename The filename of the classifications to load
+	*/
+	FeatureSet(char * featuresFilename, char * classificationFilename);
+
 	/**
 	 * initializes the matricies
 	 * @param datasetSize the size of each featureVector
@@ -65,7 +73,7 @@ public:
 	 * Gets the classification id of the string of classification 
 	 * @param classification string 
 	*/	
-	short getClassification(string classification);
+	float getClassification(string classification);
 	
 	/**
 	 * Returns the Feature Matrix 
@@ -76,5 +84,10 @@ public:
 	 * Returns the Class Matrix
 	*/
 	CvMat * getClassMatrix();
+
+	/**
+	 * Saves the featureSet and Classifications matrix to a file
+	*/
+	void saveMatrix(char * features, char * responsesFile );
 };
 #endif 

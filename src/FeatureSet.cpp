@@ -40,10 +40,35 @@ IplImage * segmentImage(IplImage * image, YUVRange range) {
 	cvAnd(yAnd, uAnd, total);
 	cvAnd(total, vAnd, total);	
 
+	// Major Major cleanup needed here!
+	cvReleaseImage(&smaller);
+	cvReleaseImage(&YUV_image);
+	cvReleaseImage(&y);
+	cvReleaseImage(&u);
+	cvReleaseImage(&v);
+	
+	cvReleaseImage(&yUpThreshold);
+	cvReleaseImage(&yDownThreshold);
+	cvReleaseImage(&yAnd);
+	
+	cvReleaseImage(&uUpThreshold);
+	cvReleaseImage(&uDownThreshold);
+	cvReleaseImage(&uAnd);
+
+	cvReleaseImage(&vUpThreshold);
+	cvReleaseImage(&vDownThreshold);
+	cvReleaseImage(&vAnd);
+
 	return total;
 }
 
 FeatureSet::FeatureSet(FeaturesExtractor * theExtractor) : extractor(theExtractor) {}
+
+FeatureSet::FeatureSet(char * featuresFilename, char * classificationFilename) {
+	featureVectors = (CvMat *)cvLoad(featuresFilename, 0, 0, 0);
+	responses = (CvMat *)cvLoad(classificationFilename, 0, 0, 0);
+}
+
 FeatureSet::~FeatureSet() {
 	if(extractor)
 		delete extractor;
@@ -61,15 +86,15 @@ void FeatureSet::initializeMatrix(int datasetSize) {
 	// Features matrix is size of datasetSize x vector size
 	featureVectors = cvCreateMat(datasetSize, extractor->getFeatureVectorSize(), CV_32FC1);
 	// Classification responses, 1 per dataset so datasetSize x 1
-	responses = cvCreateMat(datasetSize, 1, CV_32SC1);
+	responses = cvCreateMat(datasetSize, 1, CV_32FC1);
 }
 
-short FeatureSet::getClassification(string classification) {
-	for(short i=0; i < classifications.size(); i++) {
+float FeatureSet::getClassification(string classification) {
+	for(float i=0; i < classifications.size(); i++) {
 		if(classification.compare(classifications.at(i)) == 0) return i;
 	}
 	classifications.push_back(classification);
-	return (short)(classifications.size()-1);
+	return (float)(classifications.size()-1);
 }
 
 void FeatureSet::extractFeatures(Dataset * dataset) {
@@ -91,12 +116,31 @@ void FeatureSet::extractFeatures(Dataset * dataset) {
 			*( (float*)CV_MAT_ELEM_PTR( *featureVectors, image_index, i ) ) = featureVector.at(i);	
 		}
 		cout << "classification # of: " << getClassification(classification) << endl;
-		*( (short*)CV_MAT_ELEM_PTR(*responses, image_index, 0) ) = getClassification(classification);
+		*( (float*)CV_MAT_ELEM_PTR(*responses, image_index, 0) ) = getClassification(classification);
 		image_index++;
 		cout << image_index << " of " << dataset->size() << endl;
 		cvReleaseImage(&image);
+		cvReleaseImage(&segmented);
 	}
 }
 
 CvMat * FeatureSet::getFeatureMatrix() { return featureVectors; }
-CvMat * FeatureSet::getClassMatrix()   { return responses; } 
+CvMat * FeatureSet::getClassMatrix()   { return responses; }
+
+void FeatureSet::saveMatrix(char * features, char * responsesFile) {
+	/*
+	int height = featureVectors->height;
+	int width = featureVectors->width+1;	
+	File * fp = fopen(filename, "w");
+	
+	//Print the dimentions of the matrix
+	fprintf(fp, "%i %i 1\n\n", height, width);
+
+	for(int i=0; i<height; i++) {
+		for(int j=0; j<width; j++) {
+			if(j==width-2)
+				fprintf(fp, "%.4f\t", (float)((responses->
+	*/
+	cvSave(features, featureVectors);
+	cvSave(responsesFile, responses);
+} 

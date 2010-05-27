@@ -18,7 +18,7 @@ DBDataset::DBDataset(char * db, char * server, char * user, char * password, uns
 	// Temporary query to both get the dataset id and the size of the dataset
 	// Probably want to replace this with specific query using COUNT(item.id) and a single row select
 	mysqlpp::Query datasetQuery = conn.query();
-	datasetQuery << "select dataset.id as data_id, item.id as item_id, type, width, height, classification.name from dataset, item, format, classification where dataset.name = " << mysqlpp::quote << dataset << "and dataset.id = item.dataset_id and format.id = item.format_id and item.classification_id = classification.id";
+	datasetQuery << "select dataset.id as data_id, item.id as item_id, type, width, height, classification.name from dataset, item, format, classification where dataset.name = " << mysqlpp::quote << dataset << "and dataset.id = item.dataset_id and format.id = item.format_id and item.classification_id = classification.id ORDER BY RAND()";
 	if (res = datasetQuery.store()) {
 	    num_images = res.num_rows();
 	    dataset_id = res[0][0];

@@ -38,13 +38,13 @@ public:
 	 * @param featuresMatrix the features matrix
 	 * @param responses the classifications associated with each row of the featureMatrix
 	*/
-	void train(CvMat * featureMatrix, CvMat * responses);
+	void train(CvMat * featureMatrix, CvMat * responses, bool update = false);
 	
 	/**
 	 * Classify is a wrapper for the CvStatModel predict method implemented on the Classifer interface
 	 * @param featureVector the feature vector that we are classifying 
 	*/
-	float classify(CvMat * featureVector);
+	float classify(CvMat * featureMatrix, CvMat * returnMatrix = 0);
 
 	/**
 	 * Save the model!

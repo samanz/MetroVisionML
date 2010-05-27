@@ -6,12 +6,12 @@ CvClassifyWrapper::~CvClassifyWrapper() {
 	delete StatModel;
 }
 
-void CvClassifyWrapper::train(CvMat * featureMatrix, CvMat * responses) {
-	StatModel->train(featureMatrix, responses);
+void CvClassifyWrapper::train(CvMat * featureMatrix, CvMat * responses, bool update) {
+	StatModel->train(featureMatrix, responses, NULL, NULL, update);
 }
 
-float CvClassifyWrapper::classify(CvMat * featureVector) {
-	return StatModel->predict(featureVector);
+float CvClassifyWrapper::classify(CvMat * featureMatrix, CvMat * returnMatrix) {
+	return StatModel->predict(featureMatrix, returnMatrix);
 } 
 
 void CvClassifyWrapper::saveModel(const char * filename, const char * name) {

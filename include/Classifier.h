@@ -26,8 +26,8 @@ public:
  	 * @param featuresMatrix the features matrix
 	 * @param responses the classifications associated with each row of the featureMatrix
 	*/
-	virtual void train(CvMat * featuresMatrix, CvMat * responses) {};
-	virtual short classify(vector<float> * featureVector) {};
+	virtual void train(CvMat * featuresMatrix, CvMat * responses, bool update = false) {};
+	virtual float classify(CvMat * featureMatrix, CvMat * returnMatrix = 0) {};
 	virtual void saveModel(const char* filename, const char* name=0) {};
 };
 #endif

@@ -16,8 +16,9 @@ int main(int argc, char ** argv) {
 	FeaturesExtractor * extractor = new FeaturesExtractor();
 	extractor->addFeatureExtractor(angleExtractor);
 	FeatureSet * featureSet = new FeatureSet(extractor);
+	featureSet->extractFeatures(db_handle);
 	CvNormalBayesClassifier * normalBayes = new CvNormalBayesClassifier();
 	Classifier * normalBayesWrapper = new CvClassifyWrapper(normalBayes);
-	Tester * tester = new Tester(normalBayesWrapper, featureSet, db_handle);
+	Tester * tester = new Tester(normalBayesWrapper, featureSet);
 	tester->test();
 }

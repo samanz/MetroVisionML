@@ -2,6 +2,9 @@
 #include "highgui.h"
 #include "cv.h"
 #include <iostream>
+#include <math.h>
+
+#define PI 3.14159265
 
 /** This helper function finds the cosine of an angle between two vectors
    from pt0 to pt1 and then pt0 to pt2. Used by extractFeatures to get angle feature vector
@@ -14,6 +17,10 @@ double angle( CvPoint* pt1, CvPoint* pt2, CvPoint* pt0 )
     double dx2 = pt2->x - pt0->x;
     double dy2 = pt2->y - pt0->y;
     return (dx1*dx2 + dy1*dy2)/sqrt((dx1*dx1 + dy1*dy1)*(dx2*dx2 + dy2*dy2) + 1e-10);
+}
+
+int angleDegrees( CvPoint * pt1, CvPoint * pt2, CvPoint * pt0 ) {
+	return floor( acos(angle(pt1, pt2, pt0)) * (180/PI) );
 }
 
 AngleHistogramExtractor::AngleHistogramExtractor() {
@@ -33,8 +40,6 @@ vector<float> AngleHistogramExtractor::extractFeatures(IplImage * image, IplImag
 	cvShowImage("Segmentation", segmented);
 
 	/* We'll create some storage structures to store the contours we get later */
-	CvMemStorage * store = cvCreateMemStorage(0);
-	CvSeq * comp = NULL;
 	
 	IplImage * sixforty = cvCreateImage( cvGetSize(image), 8 , 1);
 	cvResize(segmented, sixforty);
@@ -60,7 +65,7 @@ vector<float> AngleHistogramExtractor::extractFeatures(IplImage * image, IplImag
 
 	/* For Debugging purposes: create image to see resulting contour */
 	IplImage * view = cvCreateImage( cvGetSize(sixforty), 8, 3);	
-	cvZero(view);
+	//cvZero(view);
 	cvDrawContours(view, largest, cvScalarAll(255), cvScalarAll(255), 0, 2, 8);
 	cvShowImage( "View", view);
 	
@@ -71,7 +76,7 @@ vector<float> AngleHistogramExtractor::extractFeatures(IplImage * image, IplImag
 				sizeof(CvContour),
 				storage,
 				CV_POLY_APPROX_DP,
-				cvContourPerimeter(largest)*0.01 
+				cvContourPerimeter(largest)*0.015 
 				);
 	
 	/*
@@ -86,22 +91,46 @@ vector<float> AngleHistogramExtractor::extractFeatures(IplImage * image, IplImag
 	cvDrawContours(view2, result, cvScalarAll(255), cvScalarAll(255), 0, 2, 8);
 	cvShowImage( "Result", view2 );
 	
-	cvWaitKey();
+	//cvWaitKey();
 	
+	int bins = 8;
+	float * histogram = new float[bins];
+	for(int i=0; i<bins; i++)
+		histogram[i] = 0.00;
+
 	/* Until we actually can send out a real feature vector: export a dummy */
 	vector<float> features;
+	vector<float> angles;
 	features.push_back(result->total);
 	double s=0;
 	int i=0;
-	for(i=0; i<8 && i<result->total; i++){
+	for(i=0; i<result->total; i++){
 		s= fabs(angle(
                             (CvPoint*)cvGetSeqElem( result, i ),
                             (CvPoint*)cvGetSeqElem( result, i-2 ),
                             (CvPoint*)cvGetSeqElem( result, i-1 )));
-		features.push_back(s);
+		int bin_index = floor( (s*bins) );
+		histogram[bin_index]++;
+		angles.push_back(s);
 	}
-	for(; i<8; i++)
-		features.push_back(0.00);	
-	cout << features.size() << " << feature size " << endl;	
+
+	sort(angles.rbegin(),angles.rend());
+ 
+	for(int i=0; i<bins; i++)
+		features.push_back( histogram[i] );
+	/*	
+	for(int i=0; i < 5; i++) {
+		if( i < angles.size() )
+			features.push_back( angles.at(i) );
+		else
+			features.push_back( 0.00 );
+
+	} */
+	/* Some cleanup, because we are decent programmers, sometimes. */
+	cvReleaseImage( &view );
+	cvReleaseImage( &view2 );
+	cvReleaseImage( &sixforty );
+	cvReleaseMemStorage( &storage );
+	cvReleaseMemStorage( &g_storage );
 	return features;
 }

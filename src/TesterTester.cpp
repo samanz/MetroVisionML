@@ -15,9 +15,10 @@ int main(int argc, char ** argv) {
 	FeaturesExtractor * extractor = new FeaturesExtractor();
 	extractor->addFeatureExtractor(featureTest);
 	FeatureSet * featureSet = new FeatureSet(extractor);
+	featureSet->extractFeatures(dataset);
 	CvNormalBayesClassifier * normalBayes = new CvNormalBayesClassifier();
 	Classifier * normalBayesWrapper = new CvClassifyWrapper(normalBayes);	
-	Tester * tester = new Tester(normalBayesWrapper, featureSet, db_handle);
+	Tester * tester = new Tester(normalBayesWrapper, featureSet);
 	tester->test();
 }
 
