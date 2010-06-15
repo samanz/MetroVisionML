@@ -82,6 +82,10 @@ STEP THREE: CLASSIFY THE WORLD.
 
 STEP FOUR: TEST IT ON THE REAL WORLD.
 	You probably want to use PlayerClassify to do classification. See README on usage.
+	Also, PlayerClassify needs to be modified to take in the same features extractors
+	in the same order as you used in the model building. Which is really IMPORTANT.
+	Right now, it is setup to use the features used for the AngleTester 
+	(Histogram of angles, Histogram of Edge Lengths, Average RGB color inside contour).
 	You can test it on the surveryor-o-l.yaml model in the models folder:
 		1. Connect the surveyor to your computer
 		2. Start up player
