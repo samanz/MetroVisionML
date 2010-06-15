@@ -1,6 +1,8 @@
 JUNE 15, 2010:
 - Not really a todo, but should be done before other things. Get the demo working again that was working for me before I left. PROOF: Mark saw it. Just get PlayerClassify working with surveryor-o-l.yaml
 
+- Get doxygen working. Should have done this earlier, but I am lazy.
+
 - Write some script to update YUV values for classifications in the database
 
 - Check PlayerClassify to see if it is memory leaking. I think it is, and wrote code to fix it, but commented it out because I can't test it here.
