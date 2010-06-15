@@ -90,9 +90,10 @@ int main(int argc, char **argv)
 				break;
 		}
 		cp.NotFresh();
-		delete [] b2;
+		/*delete [] b2;
 		delete [] buffer;
 		cvReleaseImage( &frame ); 
+`		*/
 	}
 	}
     	cvDestroyWindow( "Example2" );
