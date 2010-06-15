@@ -26,6 +26,12 @@ struct YUVRange {
 	int u_high;
 	int v_low;
 	int v_high;
+	string object;
+	int id;
+};
+
+struct YUVRanges {
+	vector<YUVRange> ranges;
 };
 
 class Dataset
@@ -35,5 +41,6 @@ public:
 	virtual string getClassification() {};
 	virtual int size() {};
 	virtual YUVRange getYUVRange() {};
+	virtual YUVRanges getAllYUVRanges() {};
 };
 #endif

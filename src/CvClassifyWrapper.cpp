@@ -17,3 +17,7 @@ float CvClassifyWrapper::classify(CvMat * featureMatrix, CvMat * returnMatrix) {
 void CvClassifyWrapper::saveModel(const char * filename, const char * name) {
 	StatModel->save(filename, name);
 }
+
+void CvClassifyWrapper::loadModel(const char * filename, const char * name) {
+	StatModel->load(filename, name);
+}

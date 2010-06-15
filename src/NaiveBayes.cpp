@@ -12,12 +12,12 @@ NaiveBayes::~NaiveBayes() {
 
 void NaiveBayes::train(CvMat * featureMatrix, CvMat * responses, bool update) {
 	// Smoothing Value
-	int l = 4;	
+	int l = 1;	
 
 	// Okay, here we go.
 	// Since we don't really know all the possible values for our featureVector
 	// We need to find the largest value for all features, but our data never exceeds 15.. so hackish.. for now?
-	posValues = 19;
+	posValues = 20;
 
 	// We will start with getting the count of the classifications seen
 	vector<int> classifications;
@@ -86,3 +86,5 @@ float NaiveBayes::classify(CvMat * featureMatrix, CvMat * returnMatrix) {
 }	
 
 void NaiveBayes::saveModel(const char * filename, const char * name) {}
+
+void NaiveBayes::loadModel(const char * filename, const char * name) {}

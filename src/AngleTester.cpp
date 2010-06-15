@@ -1,5 +1,7 @@
 #include "DBDataset.h"
 #include "AngleHistogramExtractor.h"
+#include "EdgeLengthHistogramExtractor.h"
+#include "AverageColorFeatureExtractor.h"
 #include "FeaturesExtractor.h"
 #include "CvClassifyWrapper.h"
 #include "FeatureSet.h"
@@ -13,8 +15,12 @@ int main(int argc, char ** argv) {
 	}
 	DBDataset * db_handle = new DBDataset(argv[1], argv[2], argv[3], argv[4], atoi(argv[5]), argv[6]);
 	FeatureExtractor * angleExtractor = new AngleHistogramExtractor();
+	FeatureExtractor * edgeExtractor = new EdgeLengthHistogramExtractor();
+	FeatureExtractor * colorExtractor = new AverageColorFeatureExtractor();
 	FeaturesExtractor * extractor = new FeaturesExtractor();
-	extractor->addFeatureExtractor(angleExtractor);
+	extractor->addFeatureExtractor(colorExtractor);
+	extractor->addFeatureExtractor(angleExtractor);		
+	extractor->addFeatureExtractor(edgeExtractor);
 	FeatureSet * featureSet = new FeatureSet(extractor);
 	featureSet->extractFeatures(db_handle);
 	CvNormalBayesClassifier * normalBayes = new CvNormalBayesClassifier();

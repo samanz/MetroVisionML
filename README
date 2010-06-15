@@ -1,0 +1,51 @@
+MetroVisionML:
+	A supervised machine learning classification system built on top of opencv.
+	The purpose of this program is to be able to create a system that can train a classifier
+	given images placed in a database with image and classification information.
+	Once trained the software provides an interface to classify objects using the given model.	
+
+	Files:
+		db/db.sql : The sql to generate a database in the format the program expects
+		db/metrovisionML.py : a python program that will store the files that will be uploaded into the
+			database using a folder structure in which images are stored in folders named after
+			the classification information.
+			You will need the YUV range information of the classification if the classification name isn't
+			in there yet.
+			BE CAREFUL! If it doesn't ask you to add yuv-information it means there exists that classification
+			already in the database. orangeT for the aibo should not be the same orangeT for the Scribbler!
+			Instead, best to give it a name like orangeT-aibo-6/10/2010 or something unique!
+		db/convertSet.rb : a ruby program that will convert an openCv featureSet file into a csv file
+			usage: convertSet.rb [openCv input filename] [csv output filename]
+		db/convertResp.rb : a ruby program that will convert an openCv responses file into a csv file
+			usage: convertResp.rb [openCv input filename] [csv output filename] [# of objects classified]
+		models/surveryor-o-l.yaml: a model to classify surveyor images between negatives, orangeT's, 
+			and greenLs
+
+Dependencies:
+	mysqlpp: http://tangentsoft.net/mysql++/
+	yaml-cpp: http://code.google.com/p/yaml-cpp/
+	opencv: http://opencv.willowgarage.com/wiki/Welcome
+	player: http://playerstage.sourceforge.net/	
+
+Once dependencies are installed, just run make
+		you may need to change the MYSQL_ definitions to point to where mysql++ is installed in the Makefile
+
+Programs that will be installed:
+	bin/
+		AngleTester: Tests the dataset using a combination histogram of angles, 
+		             histogram of edge length, average color
+		CalSaver: Writes as files into the folder that called it the files in a 
+                          dataset and their YUV counterparts for use in the Cal program
+		DBDatasetTest: Will iterate over all the files in a dataset and 
+			       display them onscreen, press any button to iterate
+		FileTester: Uses the featureset and the response set as files to do 
+			    classification and testing
+		VisualCortexTest: Given a model and an image, the system will output a classification
+		eyes: This program will take frames from a accessible webcam and perform classifcation 
+		      using the given model
+		PlayerClassify: Given a model this will display images from player stage (it converts from jpeg,
+				so it works with the surveyor now, need to check for JPEG or RAW, and convert later
+				to see if it works on the AIBO) and if you hit c it will save the image,
+				if you hit w it will try to classify the image, printed on the terminal.
+
+See TUTORIAL and TODO for more information

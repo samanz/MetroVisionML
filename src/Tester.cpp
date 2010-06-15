@@ -72,9 +72,14 @@ void Tester::test() {
 		cvGetRows(featureMatrix, &trainData1, 0, teststart);
 		cvGetRows(classMatrix, &trainClasses1, 0, teststart);
 
+		
 		// Segment the featureMatrix into training data, part 2
-		cvGetRows(featureMatrix, &trainData2, testend, datasize);
-		cvGetRows(classMatrix, &trainClasses2, testend, datasize);
+		if(testend != datasize) {
+			cvGetRows(featureMatrix, &trainData2, testend, datasize);
+			cvGetRows(classMatrix, &trainClasses2, testend, datasize);
+		} else {
+			trainData2.rows = 0;
+		}
 
 		// Segment into test data
 		cvGetRows(featureMatrix, &testData, teststart, testend);
@@ -102,22 +107,11 @@ void Tester::test() {
 			rowIndex++;
 		}
 							
-		/*
-		// Train the model, the first segment of training data will be empty on first run
-		if(way>0)
-			classifier->train(&trainData1, &trainClasses1);
-		else
-			classifier->train(&trainData2, &trainClasses2);
-
-		// Update the model, the last segment of traning data will be empty on last run
-		if(way>0 && way<(CROSS-1))
-			classifier->train(&trainData2, &trainClasses2, true);
-		*/
 		classifier->train(allTrain, allResponses);
 		
 		double num_correct = 0.0;
 	
-		for(int i=0; i<testsize-1; i++) {
+		for(int i=0; i<testsize; i++) {
 			CvMat row;
 			cvGetRow(&testData, &row, i);	
 		
@@ -143,4 +137,6 @@ void Tester::test() {
 		total += way_accuracy[i];
 
 	cout << "Total Accuracy: " << (float)((float)total/(float)CROSS)/((float)testsize) << endl;
+	
+	classifier->saveModel("theModel.txt");
 }

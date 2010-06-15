@@ -1,0 +1,28 @@
+YUVRanges:
+    - object: greenL-s
+      id: 0
+      y_low: 98
+      y_high: 131
+      u_low: 58
+      u_high: 119
+      v_low: 74
+      v_high: 204
+
+    - object: orangeT-s
+      id: 2
+      y_low: 39
+      y_high: 108
+      u_low: 176
+      u_high: 237
+      v_low: 67
+      v_high: 174
+
+    - object: Negatives
+      id: 1
+      y_low: 0
+      y_high: 255
+      u_low: 0
+      u_high: 255
+      v_low: 0
+      v_high: 255
+model_filename: modelN.txt 

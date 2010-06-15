@@ -29,5 +29,6 @@ public:
 	virtual void train(CvMat * featuresMatrix, CvMat * responses, bool update = false) {};
 	virtual float classify(CvMat * featureMatrix, CvMat * returnMatrix = 0) {};
 	virtual void saveModel(const char* filename, const char* name=0) {};
+	virtual void loadModel(const char * filename, const char * name=0) {};
 };
 #endif

@@ -26,30 +26,44 @@ class DBDataset: public Dataset {
 		int num_images;
 		string current_classification;
 		YUVRange _range;
+		YUVRanges _ranges;
+
+		void addYUVRange(YUVRange currentRange);
+		void storeYUVRanges();
 
 	public:
-		/*
+		/**
 		 * Gets next image, returns in openCV format of IplImage
 		*/
 		IplImage * getNextImage();
-		/*
+		
+		/**
 		 * Returns the classification string of the element just returned from getNextImage()
 		*/
 		string getClassification();
+		
 		/**
 		 * Returns the YUVRange for the object in the image
 		*/
 		YUVRange getYUVRange();
-		/*
+
+		/**
+		 * Returns all the YUVRanges we have found so far in our dataset
+		*/
+		YUVRanges getAllYUVRanges();
+
+		/**
 		 * Returns the size of the dataset
 		*/
 		int size();
-		/*
+		
+		/**
 		 * Constructor recieves the database, server, user, password, port of the mysql server, and the dataset
 		 * Name used
 		*/ 
 		DBDataset(char * db, char * server, char * user, char * password, unsigned int port, string dataset_name);
-		/*
+		
+		/**
 		 * Destructor
 		*/
 		~DBDataset();

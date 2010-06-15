@@ -28,7 +28,8 @@ public:
 	/**
 	 * Constructor takes in the CvStatModel to train on
 	*/
-	CvClassifyWrapper(CvNormalBayesClassifier * theStatModel);	
+	CvClassifyWrapper(CvNormalBayesClassifier * theStatModel);
+	
 	/**
 	 * Destructor
 	*/
@@ -51,6 +52,14 @@ public:
 	 * @param filename the filename of the file the model is saved to
 	 * @param name the name of the model 0=default
 	*/
-	void saveModel(const char* filename, const char* name=0);	
+	void saveModel(const char* filename, const char* name=0);
+	
+	/**
+	 * Load the model!
+	 * @param filename the filename of the file the model is saved to
+	 * @param name the name of the model 0=default
+	*/
+	void loadModel(const char* filename, const char * name=0);
+	
 };
 #endif /* _CV_CLASSIFY_WRAPPER_H */

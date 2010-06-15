@@ -13,7 +13,7 @@ DBDataset::DBDataset(char * db, char * server, char * user, char * password, uns
 	image_index=0;
 	// Here just to make sure max_packet_length is high enough
 	mysqlpp::Query query2 = conn.query();
-	query2.execute("set global max_allowed_packet=1000000000");
+	//query2.execute("set global max_allowed_packet=1000000000");
 
 	// Temporary query to both get the dataset id and the size of the dataset
 	// Probably want to replace this with specific query using COUNT(item.id) and a single row select
@@ -26,6 +26,7 @@ DBDataset::DBDataset(char * db, char * server, char * user, char * password, uns
         else {
             cerr << "Failed to get item list: " << datasetQuery.error() << endl;
         }
+	storeYUVRanges();
 }
 
 int DBDataset::size() { return num_images; }
@@ -46,15 +47,16 @@ IplImage * DBDataset::getNextImage() {
 		int image_height = imageResult[0][3];
 		imageResult[0][1].to_string(current_classification);
 
-		/* Store the YUV Range (Really just UV range) */
+		/* Store the YUV Range */
 		_range.y_low = imageResult[0][5];
 		_range.y_high = imageResult[0][6];
 		_range.u_low = imageResult[0][7];
 		_range.u_high = imageResult[0][8];
 		_range.v_low = imageResult[0][9];
 		_range.v_high = imageResult[0][10];
+		_range.object = current_classification;
 		/* End storing of YUV ranges */
-
+		
 		cout << image_width << " " << image_height << endl;
 		cout << "Should be : " << image_width * image_height * 3 << endl;
 		cout << "Index of: " << image_id << endl;
@@ -80,9 +82,53 @@ IplImage * DBDataset::getNextImage() {
 }
 
 YUVRange DBDataset::getYUVRange() {
-	//if(image_index>num_images) return 0;
 	return _range;
 } 
+
+YUVRanges DBDataset::getAllYUVRanges() {
+	return _ranges;
+}
+
+void DBDataset::storeYUVRanges() {
+	mysqlpp::Query yuvQuery = conn.query();
+	yuvQuery << "select classification.name, y_low, y_high, u_low, u_high, v_low, v_high from classification, dataset, item where dataset.name = " << mysqlpp::quote << dataset << " and dataset.id = item.dataset_id  and item.classification_id = classification.id";
+	mysqlpp::StoreQueryResult imageResult;
+	if(imageResult = yuvQuery.store()) {
+		for(int i=0; i<res.num_rows(); i++) {
+			YUVRange crange;
+			/* Store the YUV Range */
+			crange.y_low = imageResult[i][1];
+			crange.y_high = imageResult[i][2];
+			crange.u_low = imageResult[i][3];
+			crange.u_high = imageResult[i][4];
+			crange.v_low = imageResult[i][5];
+			crange.v_high = imageResult[i][6];
+			string cc;
+			imageResult[i][0].to_string(cc);
+			crange.object = cc;
+			/* End storing of YUV ranges */
+		
+			addYUVRange(crange);
+		}
+	}	
+}
+
+void DBDataset::addYUVRange(YUVRange currentRange) {
+	// Don't want to add useless ranges
+	if(currentRange.y_low != 0 || currentRange.y_high != 0) {
+		
+		//First check if the objects range is already in there:
+		bool alreadythere = false;
+		for(int i=0;i<_ranges.ranges.size();i++) {
+			if(_ranges.ranges[i].object == currentRange.object)
+				alreadythere = true;
+		}
+	
+		// If its not there yet, put it there!
+		if(!alreadythere)
+			_ranges.ranges.push_back(currentRange);
+	} 
+}
 
 string DBDataset::getClassification() {
 	// Get image classification!

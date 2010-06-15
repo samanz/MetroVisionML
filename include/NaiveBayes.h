@@ -70,5 +70,12 @@ public:
 	 * @param name the name of the model 0=default
 	*/
 	void saveModel(const char * filename, const char* name);
+
+	/**
+	 * Load the model! Because we don't want to always retrain the data to classify, right?i
+	 * @param filename the filename of the file the model is saved to
+	 * @param name the name of the model 0=default
+	*/
+	void loadModel(const char * filename, const char* name);
 };
 #endif /* _NAIVE_BAYES_H */

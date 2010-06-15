@@ -2,6 +2,7 @@
 #include "highgui.h"
 #include <iostream>
 
+
 IplImage * segmentImage(IplImage * image, YUVRange range) {
 	
 	IplImage * smaller = cvCreateImage( cvSize(208, 160), 8, 3);
@@ -37,8 +38,12 @@ IplImage * segmentImage(IplImage * image, YUVRange range) {
 	cvAnd(vUpThreshold, vDownThreshold, vAnd);
 
 	IplImage * total = cvCreateImage( cvGetSize(vAnd), 8, 1);
+	IplImage * final = cvCreateImage( cvGetSize(image), 8, 1);
+
 	cvAnd(yAnd, uAnd, total);
-	cvAnd(total, vAnd, total);	
+	cvAnd(total, vAnd, total);
+	
+	cvResize(total, final);
 
 	// Major Major cleanup needed here!
 	cvReleaseImage(&smaller);
@@ -59,7 +64,9 @@ IplImage * segmentImage(IplImage * image, YUVRange range) {
 	cvReleaseImage(&vDownThreshold);
 	cvReleaseImage(&vAnd);
 
-	return total;
+	cvReleaseImage(&total);	
+
+	return final;
 }
 
 FeatureSet::FeatureSet(FeaturesExtractor * theExtractor) : extractor(theExtractor) {}
@@ -108,19 +115,41 @@ void FeatureSet::extractFeatures(Dataset * dataset) {
 	while(image_index < dataset->size()) {
 		IplImage * image = dataset->getNextImage();
 		string classification = dataset->getClassification();
-		YUVRange range = dataset->getYUVRange();
-		IplImage * segmented = segmentImage(image, range);
-		vector<float> featureVector = extractor->extractFeatures(image, segmented);
-		for(int i=0; i < featureVector.size(); i++) {
-			// I'm sure there is a better way of doing here what I wanna do, but if it works?!	
-			*( (float*)CV_MAT_ELEM_PTR( *featureVectors, image_index, i ) ) = featureVector.at(i);	
+		// We need to treat negative and positive classification images differently
+		if(classification != "Negatives") {
+			YUVRange range = dataset->getYUVRange();
+			IplImage * segmented = segmentImage(image, range);
+			vector<float> featureVector = extractor->extractFeatures(image, segmented);
+			for(int i=0; i < featureVector.size(); i++) {
+				// I'm sure there is a better way of doing here what I wanna do, but if it works?!	
+				*( (float*)CV_MAT_ELEM_PTR( *featureVectors, image_index, i ) ) = featureVector.at(i);	
+			}
+			cout << "classification # of: " << getClassification(classification) << endl;
+			*( (float*)CV_MAT_ELEM_PTR(*responses, image_index, 0) ) = getClassification(classification);
+			image_index++;
+			cout << image_index << " of " << dataset->size() << endl;
+			cvReleaseImage(&image);
+			cvReleaseImage(&segmented);
+		} else {
+			YUVRanges ranges = dataset->getAllYUVRanges();
+			float klass = getClassification(classification);
+			for(int r=0; r<ranges.ranges.size(); r++) {
+				cout << ranges.ranges.at(r).object << endl;
+				IplImage * segmented = segmentImage(image, ranges.ranges.at(r));
+				vector<float> featureVector = extractor->extractFeatures(image, segmented);
+				for(int i=0; i < featureVector.size(); i++) {
+					*( (float*)CV_MAT_ELEM_PTR( *featureVectors, image_index, i ) ) = featureVector.at(i);	
+				}
+				cout << "classification # of: " << getClassification(classification) << endl;
+				*( (float*)CV_MAT_ELEM_PTR(*responses, image_index, 0) ) = getClassification(classification);
+				cout << image_index << " of " << dataset->size() << endl;
+				cvReleaseImage(&segmented);				
+				if(featureVector.size() > 0)	
+					image_index++;
+			}
+			
+			cvReleaseImage(&image);
 		}
-		cout << "classification # of: " << getClassification(classification) << endl;
-		*( (float*)CV_MAT_ELEM_PTR(*responses, image_index, 0) ) = getClassification(classification);
-		image_index++;
-		cout << image_index << " of " << dataset->size() << endl;
-		cvReleaseImage(&image);
-		cvReleaseImage(&segmented);
 	}
 }
 
@@ -128,19 +157,6 @@ CvMat * FeatureSet::getFeatureMatrix() { return featureVectors; }
 CvMat * FeatureSet::getClassMatrix()   { return responses; }
 
 void FeatureSet::saveMatrix(char * features, char * responsesFile) {
-	/*
-	int height = featureVectors->height;
-	int width = featureVectors->width+1;	
-	File * fp = fopen(filename, "w");
-	
-	//Print the dimentions of the matrix
-	fprintf(fp, "%i %i 1\n\n", height, width);
-
-	for(int i=0; i<height; i++) {
-		for(int j=0; j<width; j++) {
-			if(j==width-2)
-				fprintf(fp, "%.4f\t", (float)((responses->
-	*/
 	cvSave(features, featureVectors);
 	cvSave(responsesFile, responses);
 } 
