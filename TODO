@@ -1,0 +1,26 @@
+JUNE 15, 2010:
+- Not really a todo, but should be done before other things. Get the demo working again that was working for me before I left. PROOF: Mark saw it. Just get PlayerClassify working with surveryor-o-l.yaml
+
+- Write some script to update YUV values for classifications in the database
+
+- Check PlayerClassify to see if it is memory leaking. I think it is, and wrote code to fix it, but commented it out because I can't test it here.
+
+- Fix PlayerClassify so that it gets the type of image from the CamProxy and only decompresses it if it is of JPEG type.
+
+- When the features are extracted in FeatureSet class, since it does not know the size of the featureset until we finished with feature detection (Negative images may or may not have contours for each segmentation). Right now it stops adding feature rows when it reaches the size of the dataset. This might not be the biggest deal in the world (we may have enough of training data to classify anyways) but more training data is always a good thing!. 
+
+- Play with different kinds of feature extractors, think of your own. This is the largest RESEARCH aspect of this project. Which feature extractors provide the best method of classifying these kinds of objects?
+
+- Change CvClassifyWrapper so that we can wrap other kinds of supervised ML from openCv, notably the multi-layer perceptron class. Test it. Use it. Love it.
+
+- Change color feature extractor to use a higher range for the RGB values. Probably will do a better job with classifying. The NaiveBayes class I implemented has a variable posValues which is the largest possible values that could be used. You could just bump that up to 255, but it will use lots more memory, or you could detect the largest value and use that. Probably just using 255 won't be too bad. 
+
+- Change the format of classify to use NaiveBayes probablity values for negatives instead of Negative classifications. You would just use a threshold (based on real world testing) on the estimation to determine if there is an object there. You would also need to fix NaiveBayes so that it implements the saveModel and loadModel methods, so as to be able to load the model for real-time classification. (Just serialize and parse the theta and pi multi-dimentional arrays). 
+
+- Implement a way to do have a DEBUG value set so as to show the debugging information that is displayed in each FeatureExtractors.
+
+- Turn the thing into a self-contained library, and remove all the test files and place them into a seperate folder. -useful.
+
+- When you find a good feature extractors set in testing that you want to deploy, you may want to combine them into one larger feature extractor, since each feature extractor duplicates much effort, such as finding the contours.
+
+- The last problem I found when doing the classification in real-time was that sometimes things would get caught in the segmentation, adding to shape of the segmentation. We could do countour finding using the largest contour as a mask, and then do classification on all coutours greater than a certain size (would probably want the classiciation to be done in sorted decending order). I don't know if this would add to many false positives.
