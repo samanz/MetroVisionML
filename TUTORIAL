@@ -18,7 +18,7 @@ HOW TO CREATE A MODEL: A TUTORIAL
 	named after the classification wanted to be stored into the database.
 	You want to make sure the files are not very large in size, and you 
 	can resize them to 320x240 or less using any method (I've been using
-	mogrify */*.jpg as a fast and simple solution).
+	`mogrify -resize 240x320 */*.jpg` as a fast and simple solution).
 	These classification names should be unique per model (or at least each
 	image source (ie. robot (I LOVE NESTED PARENS))). Negatives should be in a
 	subfolder named Negatives (case sensitive), and have YUV range of 0-255 for all.
