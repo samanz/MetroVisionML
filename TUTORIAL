@@ -1,0 +1,94 @@
+HOW TO CREATE A MODEL: A TUTORIAL
+	So you think you can train a model to classify blocky objects? Don't you?
+	Well, here is a little helper to help you along the process. It is written 	   	  by me, so you know it will help. You should be classifing objects left and 
+	right after this, so well, you can thank me later. Best is to read this the whole
+	way through once before going step by step trying to get it done. 
+	IF YOU ARE SMART YOU MAY GET TO SKIP A STEP OR TWO.
+
+ STEP ONE:
+	You wanna make sure that you have training (and testing, but they are the 
+	same) images to classify. Get them anyway you can. One requirement is that 
+	the largest thing in each image should be the object you are trying to classify.
+	You also may want to get a ton of negative images as well that do not contain
+	any of the objects you want to classify. Put those files into subfolders
+	named after the classification wanted to be stored into the database.
+	You want to make sure the files are not very large in size, and you 
+	can resize them to 320x240 or less using any method (I've been using
+	mogrify */*.jpg as a fast and simple solution).
+	These classification names should be unique per model (or at least each
+	image source (ie. robot (I LOVE NESTED PARENS))). Negatives should be in a
+	subfolder named Negatives (case sensitive), and have YUV range of 0-255 for all.
+	
+	Then you want to run:
+	metrovisionml.py in that directory (I added that file to my PATH to make
+	things much easier for me). It will ask you for YUV Ranges. Set them to
+	0-255 for now. Run CalSaver program in a new directory.
+	 	example: mkdir calimages
+			 cd calimages
+			 ../bin/CalSaver metrovision bots.sci.brookyln.cuny.edu mysql-user 				mysql-pass 3306 datasetname
+		(3306 is the default mysql port number)
+
+	You should get the images in the Cal program format. Unfortunatly, CalSaver
+	currently saves objects at random so files are not in sequence to type. But
+	you should be able to get those objects in Cal and get the YUV ranges.
+	Optimally, you should pass in images where the objects have all the
+	backgrounds the object is most likely to have. DO THIS AS BEST AS YOU CAN. 
+	IMPORTANT.
+
+	You will then need to update the YUV ranges in the database. We should write
+	a script to do that, but I've just been writing sql. Login to bots using ssh
+	ssh username@bots.sci.brooklyn.cuny.edu and login. Then you run:
+		mysql -u username -p and then login
+		>use metrovision;
+		>select * from classification; ->Returns classification and range
+		>update classification set COLUMN = VALUE, ... where 
+			id = ID_OF_CLASSIFICATION;
+	Annoying. If you want to create a script to do this, do it. Please. I might even
+	do it if I get the chance. 
+
+
+STEP TWO: TRAINING AND TESTING
+	Okay, so by now you have a set of images under a dataset in the database.
+	So, what we want to do is train a model and test to see if it works.
+	If we have a decent model (good % accuracy) we can then test it in the real world.
+	To do this, we want to build a featureset from our feature extractor.
+	You can do this with AngleTester currently using current feature extractors,
+	or you can do this with other feature extractors.
+	As the file are classified, you'll get these messages on the terminal:
+		Classification of: greenL
+		3 921600 307200 8
+		classification # of: 0
+	note the classification #'s for each object name. You'll need it for later.
+	just run ./bin/AngleTester metrovision bots.sci.brooklyn.cuny.edu mysql-user 
+		mysql-passwd 3306 datasetname
+	It will do the training and 5-way cross validation. Right now it will
+	use openCv's normal bayes (naive bayes). Anytime you do a testing
+	three files will be outputed to the filesystem:
+		features.txt
+			The featureset
+		responses.txt
+			The classifications, corresponding to a featureset
+		theModel.txt
+			The model that you classified.
+
+STEP THREE: CLASSIFY THE WORLD.
+	Okay, if you did everything correctly, you should have the a model you want to 
+	use. Your also gonna want to create a model.yaml file. Use the surveryor-o-l.yaml
+	file as a basis to write one. Just list YUV ranges and use the object id's you
+	noted last step to associate with each classification object name.
+	WORLD CLASSIFIED!
+
+STEP FOUR: TEST IT ON THE REAL WORLD.
+	You probably want to use PlayerClassify to do classification. See README on usage.
+	You can test it on the surveryor-o-l.yaml model in the models folder:
+		1. Connect the surveyor to your computer
+		2. Start up player
+		3. cd models
+		4. ../bin/PlayerClassify surveryor-o-l.yaml
+		5. hit w button to test classifier.
+	Hope that wasn't too patronizing... which is when you treat people in a 
+	condescending manner.
+
+IF YOU HAVE QUESTIONS EMAIL ME (OR ADD AS ME ON GOOGLE MAIL CHAT OR FACEBOOK)
+SAMANZAROOT@GMAIL.COM | SAM ANZAROOT
+KTHXBYE
