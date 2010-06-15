@@ -1,6 +1,7 @@
 HOW TO CREATE A MODEL: A TUTORIAL
 	So you think you can train a model to classify blocky objects? Don't you?
-	Well, here is a little helper to help you along the process. It is written 	   	  by me, so you know it will help. You should be classifing objects left and 
+	Well, here is a little helper to help you along the process. It is written 	   	 
+	by me, so you know it will help. You should be classifing objects left and 
 	right after this, so well, you can thank me later. Best is to read this the whole
 	way through once before going step by step trying to get it done. 
 	IF YOU ARE SMART YOU MAY GET TO SKIP A STEP OR TWO.
@@ -25,7 +26,8 @@ HOW TO CREATE A MODEL: A TUTORIAL
 	0-255 for now. Run CalSaver program in a new directory.
 	 	example: mkdir calimages
 			 cd calimages
-			 ../bin/CalSaver metrovision bots.sci.brookyln.cuny.edu mysql-user 				mysql-pass 3306 datasetname
+			 ../bin/CalSaver metrovision bots.sci.brookyln.cuny.edu mysql-user 				
+				mysql-pass 3306 datasetname
 		(3306 is the default mysql port number)
 
 	You should get the images in the Cal program format. Unfortunatly, CalSaver
