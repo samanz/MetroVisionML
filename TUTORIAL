@@ -11,8 +11,8 @@ HOW TO CREATE A MODEL: A TUTORIAL
 	same) images to classify. Get them anyway you can. One requirement is that 
 	the largest thing in each image should be the object you are trying to classify.
 	Also, try to make sure you get tons of angles of the object, but not the angles
-	that make it kinda trivial like if it is strait on then it is just a square, for now
-	we may want to add it later if we are confident the system can handle it.
+	that make it trivial (ex. if the object is viewed straight on like just a square). 
+        We may want to add it later if we are confident the system can handle it.
 	You also may want to get a ton of negative images as well that do not contain
 	any of the objects you want to classify. Put those files into subfolders
 	named after the classification wanted to be stored into the database.
